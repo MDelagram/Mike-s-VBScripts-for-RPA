@@ -1,23 +1,43 @@
-'To Open Excel:
-Set objExcel = CreateObject("Excel.Application")
-objExcel.application.visible = True
-objExcel.application.displayalerts = False
+'To run this script use:
+'wscript|cscript.exe "<FilePathToScript>\Export Word to PDF.vbs" "<filePathToDoc>.docx"
+
+' Check if the command-line arguments are provided
+If WScript.Arguments.Count <> 1 Then
+    WScript.Echo "Please provide the path to the Word document as an argument."
+    WScript.Quit 1
+End If
+
+'MsgBox "Argument text: " &WScript.Arguments(0)
+
+' Get the path to the Word document from the command-line argument
+Dim docPath
+docPath = WScript.Arguments(0)
+
+Dim objWord, objDoc
+
+' Create an instance of Word application
+Set objWord = CreateObject("Word.Application")
+
+' Hide Word application window
+objWord.Visible = False
+
+' Open the Word document
+Set objDoc = objWord.Documents.Open(docPath)
+
+' Output PDF path
+Dim pdfPath
+pdfPath = Replace(docPath,".docx","")
+
+' Export the document as PDF
+objDoc.ExportAsFixedFormat pdfPath & ".pdf", 17 ' 17 represents the PDF format
 
 
-'To Attach to an already open Excel:
-'Set objExcel = GetObject("C:\Users\myUsername\Desktop\MyExcel.xlsx").Application
+' Close the Word document
+objDoc.Close False
 
-Set wkbk = objExcel.Workbooks.Open("C:\Users\MyUsername\Desktop\MyFile.xlsx")
-'Set sht = wkbk.Sheets(1)
+' Quit the Word application
+objWord.Quit
 
-const xlTypePDF	= 0
-const xlQualityStandard = 0
-'ExportAsFixedFormat Arguments: 1Type, 2FileName, 3Quality (opt), 4IncludeDocProperties (opt), 5IgnorePrintAreas (opt), 6From (opt), 
-'	7To (opt), 8OpenAfterPublish (opt)
-objExcel.ActiveWorkbook.ExportAsFixedFormat xlTypePDF,"C:\Users\MyUsername\Desktop\MyFile.pdf",xlQualityStandard,True,False,,,False
-
-'objExcel.ActiveWorkbook.ExportAsFixedFormat xlTypePDF, "C:\Users\mdelagrammatikas\Desktop\MyFile.pdf",xlQualityStandard,1,0,,,0
-
-' Close without saving
-objExcel.Application.Quit
-objExcel.Quit
+' Release the objects from memory
+Set objDoc = Nothing
+Set objWord = Nothing
